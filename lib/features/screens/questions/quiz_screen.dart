@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:quiz_app/features/screens/result_screen.dart';
+import 'package:hive/hive.dart';
+import 'package:quizzie/features/screens/result_screen.dart';
+import 'package:quizzie/notification/notification_service.dart';
 
 import '../../controllers/questions_controller.dart';
 import '../../controllers/theme_controller.dart';
@@ -120,9 +123,9 @@ class QuizScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w500,
                                   color: isSubmitted.value
                                       ? (isSelectedOption && isCorrect!
-                                            ? Colors.red
-                                            : isCorrectOption
                                             ? Colors.green
+                                            : isCorrectOption
+                                            ? Colors.red
                                             : Theme.of(context)
                                                       .textTheme
                                                       .bodyMedium
@@ -152,18 +155,56 @@ class QuizScreen extends StatelessWidget {
           color: Colors.indigo,
           height: 50,
           shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () {
+          onPressed: () async {
             final quizData = questionsController.getQuizData(quizType);
             final questions = quizData[0]['questions'];
             if (questionsController.selectedAnswers.length < questions.length) {
-              Get.snackbar('Error', 'Please answer all questions');
+              Get.snackbar(
+                'Incomplete',
+                'Please answer all questions',
+                backgroundColor: Colors.red,
+              );
               return;
             }
 
             if (!isSubmitted.value) {
               isSubmitted.value = true;
               questionsController.compareCorrectAnswers(quizType);
-              Get.to(() => ResultScreen(quizType: quizType));
+
+              final result = {
+                'quizType': quizType,
+                'questions': questions,
+                'selectedAnswers': questionsController.selectedAnswers.map(
+                  (key, value) => MapEntry(key.toString(), value),
+                ),
+                'answerResults': questionsController.answerResults.map(
+                  (key, value) => MapEntry(key.toString(), value),
+                ),
+                'score': questionsController.score,
+                'total': questions.length,
+                'timestamp': DateTime.now().toString(),
+              };
+
+              final box = Hive.box('quiz_results');
+              final List history = box.get('results', defaultValue: []);
+              history.add(result);
+              await box.put('results', history);
+
+              // await sendPushNotification();
+              await NotificationService.flutterLocalNotificationsPlugin.show(
+                0,
+                '🎉 Quiz Completed!',
+                'Congratulations! You’ve successfully completed the quiz.',
+                const NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    'quiz_channel',
+                    'Quiz Notifications',
+                    importance: Importance.high,
+                    priority: Priority.high,
+                  ),
+                ),
+              );
+              Get.to(() => ResultScreen(result: result));
             }
           },
           child: Text(

@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quiz_app/features/controllers/questions_controller.dart';
-import 'package:quiz_app/features/controllers/theme_controller.dart';
-import 'package:quiz_app/features/screens/profile_screen.dart';
-import 'package:quiz_app/features/screens/questions/quiz_screen.dart';
+import 'package:quizzie/features/controllers/questions_controller.dart';
+import 'package:quizzie/features/controllers/theme_controller.dart';
+import 'package:quizzie/features/screens/history_screen.dart';
+import 'package:quizzie/features/screens/profile_screen.dart';
+import 'package:quizzie/features/screens/questions/quiz_screen.dart';
 
 class HomePageScreen extends StatelessWidget {
   HomePageScreen({super.key});
@@ -21,13 +22,9 @@ class HomePageScreen extends StatelessWidget {
       drawer: Scaffold(
         appBar: AppBar(
           actionsPadding: const EdgeInsets.only(right: 16),
-          title: Obx(
-            () => Text(
-              questionsController.isSelected == 'ENGLISH'
-                  ? 'Quizzie'
-                  : 'क्विज़ी',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-            ),
+          title: Text(
+            'quizzie'.tr,
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
           ),
           actions: [
             GestureDetector(
@@ -47,19 +44,26 @@ class HomePageScreen extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  GestureDetector(
+                    onTap: () => Get.to(() => HistoryScreen()),
+                    child: Text(
+                      'history'.tr,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
                   Text(
-                    questionsController.isSelected == 'ENGLISH'
-                        ? 'Theme'
-                        : 'थिम',
+                    'theme'.tr,
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                   RadioListTile<AppThemeMode>(
                     value: AppThemeMode.system,
                     groupValue: themeController.themeMode,
                     title: Text(
-                      questionsController.isSelected == 'ENGLISH'
-                          ? 'System Default'
-                          : 'प्रणाली डिफल्ट',
+                      'system_default'.tr,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -71,9 +75,7 @@ class HomePageScreen extends StatelessWidget {
                     value: AppThemeMode.light,
                     groupValue: themeController.themeMode,
                     title: Text(
-                      questionsController.isSelected == 'ENGLISH'
-                          ? 'Light Mode'
-                          : 'हल्का रंग मोड',
+                      'light_mode'.tr,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -85,9 +87,7 @@ class HomePageScreen extends StatelessWidget {
                     value: AppThemeMode.dark,
                     groupValue: themeController.themeMode,
                     title: Text(
-                      questionsController.isSelected == 'ENGLISH'
-                          ? 'Dark Mode'
-                          : 'अँध्यारो मोड',
+                      'dark_mode'.tr,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -104,6 +104,10 @@ class HomePageScreen extends StatelessWidget {
       appBar: AppBar(
         actionsPadding: const EdgeInsets.all(10),
         actions: [
+          // SvgPicture.asset(
+          //   'assets/icons/notification.svg',
+          //   color: Theme.of(context).textTheme.bodyMedium?.color,
+          // ),
           Obx(
             () => GestureDetector(
               onTap: () {

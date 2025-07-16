@@ -1,4 +1,4 @@
-name: quiz_app
+name: quizzie
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -37,6 +37,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   get: ^4.7.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_svg: ^2.2.0
+  flutter_local_notifications: ^19.3.0
+  firebase_core: ^3.15.1
+  firebase_messaging: ^15.2.9
+  permission_handler: ^12.0.1
+  http: ^1.4.0
+  googleapis_auth: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +69,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/icons/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quiz_app/features/controllers/questions_controller.dart';
+import 'package:quizzie/features/controllers/questions_controller.dart';
 
 class ResultScreen extends StatelessWidget {
-  final String quizType;
-  ResultScreen({super.key, required this.quizType});
+  // final String quizType;
+  final Map<String, dynamic> result;
+  ResultScreen({super.key, required this.result});
 
   final QuestionsController questionsController = Get.put(
     QuestionsController(),
@@ -12,8 +13,8 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final quizData = questionsController.getQuizData(quizType);
-    final questions = quizData.isNotEmpty ? quizData[0]['questions'] : [];
+    final quizType = result['quizType'];
+    final questions = result['questions'] as List<dynamic>;
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +29,7 @@ class ResultScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Your Score: ${questionsController.score}/${questions.length}',
+              'Your Score: ${result['score']}/${result['total']}',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -42,12 +43,19 @@ class ResultScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final question = questions[index];
                   final questionId = question['id'];
-                  final userAnswer =
-                      questionsController.selectedAnswers[questionId];
+                  final selectedAnswers = Map<String, dynamic>.from(
+                    result['selectedAnswers'],
+                  );
+                  final answerResults = Map<String, dynamic>.from(
+                    result['answerResults'],
+                  );
+
+                  final userAnswer = selectedAnswers[questionId.toString()];
+                  final isCorrect =
+                      answerResults[questionId.toString()] ?? false;
+
                   final correctAnswer =
                       question['options'][question['answerIndex']];
-                  final isCorrect =
-                      questionsController.answerResults[questionId] ?? false;
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),

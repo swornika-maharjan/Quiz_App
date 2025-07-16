@@ -23,6 +23,7 @@ class AppTranslations extends Translations {
       'computer_science': 'Computer Science Knowledge Quiz',
       'sports_knowledge_quiz': 'Sports Knowledge Quiz',
       'literature_knowledge_quiz': 'Literature Knowledge Quiz',
+      'history': 'History'
     },
     'ne_NP': {
       'mixed_questions': 'मिश्रित प्रश्नहरू',
@@ -44,6 +45,7 @@ class AppTranslations extends Translations {
       'computer_science': 'कम्प्युटर विज्ञान प्रश्नोत्तरी',
       'sports_knowledge_quiz': 'खेलकुद ज्ञान प्रश्नोत्तरी',
       'literature_knowledge_quiz': 'साहित्य ज्ञान प्रश्नोत्तरी',
+      'history': 'इतिहास'
     },
   };
 }
