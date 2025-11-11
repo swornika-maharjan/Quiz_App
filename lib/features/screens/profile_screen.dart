@@ -16,9 +16,23 @@ class ProfileScreen extends StatelessWidget {
           child: Divider(),
         ),
       ),
-      body: Column(children: [
-        
-      ],),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: CircleAvatar(radius: 40, child: Icon(Icons.person)),
+          ),
+          Text(
+            'Welcome user!!',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.blueGrey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
