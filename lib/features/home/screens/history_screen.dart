@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:quizzie/features/screens/result_screen.dart';
+import 'package:quizzie/features/questions/screens/result_screen.dart';
 import 'package:quizzie/utils/utils.dart';
 
 class HistoryScreen extends StatelessWidget {

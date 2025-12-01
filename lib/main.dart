@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:quizzie/features/controllers/questions_controller.dart';
-import 'package:quizzie/features/controllers/theme_controller.dart';
-import 'package:quizzie/features/screens/home_page_screen.dart';
+import 'package:quizzie/api-service/api_service.dart';
+import 'package:quizzie/features/auth/screens/login_screen.dart';
+import 'package:quizzie/features/home/controllers/theme_controller.dart';
+import 'package:quizzie/features/home/screens/home_page_screen.dart';
+import 'package:quizzie/features/questions/controllers/questions_controller.dart';
 import 'package:quizzie/notification/notification_service.dart';
 // import 'package:quizzie/notification/notification_service.dart';
 import 'package:quizzie/utils/translation.dart';
@@ -22,14 +24,49 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('quiz_results');
+  await Hive.openBox('authBox');
+
   // Handle messages when the app is in the background or terminated
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await NotificationService.requestNotificationPermission();
   NotificationService().initializeNotifications();
 
+  // Restore JWT token if exists
+  var authBox = Hive.box('authBox');
+  final savedToken = authBox.get('token');
+  if (savedToken != null) {
+    RESTExecutor.setToken(savedToken);
+    print("RESTExecutor token restored: $savedToken");
+  }
+
   Get.put(ThemeController());
   Get.put(QuestionsController());
   runApp(MyApp());
+}
+
+class RootApp extends StatelessWidget {
+  const RootApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Future.wait([
+        Hive.openBox('quiz_results'),
+        Hive.openBox('authBox'),
+      ]),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+        return const MyApp();
+      },
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -68,6 +105,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // Request notification permissions
     _firebaseMessaging.requestPermission();
+    var box = Hive.box('authBox');
+    String? token = box.get('token');
 
     return Obx(
       () => GetMaterialApp(
@@ -84,7 +123,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         themeMode: themeController.currentThemeMode,
-        home: HomePageScreen(),
+        home: token != null ? HomePageScreen() : LoginScreen(),
       ),
     );
   }

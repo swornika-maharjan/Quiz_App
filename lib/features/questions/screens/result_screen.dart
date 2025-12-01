@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quizzie/features/controllers/questions_controller.dart';
+import 'package:quizzie/features/questions/controllers/questions_controller.dart';
 
 class ResultScreen extends StatelessWidget {
   // final String quizType;
@@ -10,6 +10,7 @@ class ResultScreen extends StatelessWidget {
   final QuestionsController questionsController = Get.put(
     QuestionsController(),
   );
+  int index = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class ResultScreen extends StatelessWidget {
                 itemCount: questions.length,
                 itemBuilder: (context, index) {
                   final question = questions[index];
-                  final questionId = question['id'];
+                  final questionId = question['_id'];
                   final selectedAnswers = Map<String, dynamic>.from(
                     result['selectedAnswers'],
                   );
@@ -54,8 +55,7 @@ class ResultScreen extends StatelessWidget {
                   final isCorrect =
                       answerResults[questionId.toString()] ?? false;
 
-                  final correctAnswer =
-                      question['options'][question['answerIndex']];
+                  final correctAnswer = question['correctAnswer'];
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
@@ -65,7 +65,7 @@ class ResultScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${question['id']}. ${question['question']}',
+                            '${index + 1}. ${question['questionText']}',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
