@@ -9,6 +9,7 @@ import 'package:quizzie/features/auth/screens/login_screen.dart';
 import 'package:quizzie/features/home/controllers/theme_controller.dart';
 import 'package:quizzie/features/home/screens/home_page_screen.dart';
 import 'package:quizzie/features/questions/controllers/questions_controller.dart';
+import 'package:quizzie/features/splash_screen.dart';
 import 'package:quizzie/notification/notification_service.dart';
 // import 'package:quizzie/notification/notification_service.dart';
 import 'package:quizzie/utils/translation.dart';
@@ -123,7 +124,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         themeMode: themeController.currentThemeMode,
-        home: token != null ? HomePageScreen() : LoginScreen(),
+        home: token != null ? HomePageScreen() : SplashScreen(),
       ),
     );
   }
