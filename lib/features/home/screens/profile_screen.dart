@@ -174,10 +174,10 @@ class ProfileScreen extends StatelessWidget {
             children: [
               Text(
                 'Select Language'.tr,
-                style: const TextStyle(
+                style: header5.copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
-                  color: Colors.brown,
+                  color: QZColor.headerColor,
                 ),
               ),
               const SizedBox(height: 12),
@@ -204,15 +204,15 @@ class ProfileScreen extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       title: Text(
         title,
-        style: header5.copyWith(
-          color: Colors.grey,
+        style: header6.copyWith(
+          color: Colors.black,
           fontWeight: FontWeight.w400,
         ),
       ),
       trailing: Radio<String>(
         value: value,
         groupValue: homeController.isSelected,
-        activeColor: Colors.brown,
+        activeColor: QZColor.headerColor,
         onChanged: (val) {
           if (val != null) {
             homeController.toggleTranslation(val);
@@ -247,7 +247,7 @@ class ProfileScreen extends StatelessWidget {
                 'Select Theme'.tr,
                 style: header5.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: Colors.brown,
+                  color: QZColor.headerColor,
                 ),
               ),
               const SizedBox(height: 12),
@@ -278,15 +278,15 @@ class ProfileScreen extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       title: Text(
         title,
-        style: header5.copyWith(
-          color: Colors.grey,
+        style: header6.copyWith(
+          color: Colors.black,
           fontWeight: FontWeight.w400,
         ),
       ),
       trailing: Radio<AppThemeMode>(
         value: value,
         groupValue: themeController.themeMode,
-        activeColor: Colors.brown,
+        activeColor: QZColor.headerColor,
         onChanged: (val) {
           if (val != null) {
             themeController.changeTheme(val);

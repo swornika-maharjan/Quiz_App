@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:quizzie/features/home/controllers/home_controller.dart';
 import 'package:quizzie/features/home/controllers/profile_controller.dart';
 import 'package:quizzie/features/home/screens/history_screen.dart';
@@ -13,8 +12,6 @@ import 'package:quizzie/utils/colors.dart';
 import 'package:quizzie/utils/styles.dart';
 import 'package:intl/intl.dart';
 
-import 'package:quizzie/utils/utils.dart';
-
 class HomePageScreen extends StatelessWidget {
   HomePageScreen({super.key});
 
@@ -24,87 +21,174 @@ class HomePageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => Scaffold(
-        appBar: AppBar(
-          title: Row(
+    return Scaffold(
+      appBar: _buildAppBar(),
+      // body: PageView(
+      //   controller: pageController,
+      //   onPageChanged: (index) {
+      //     homeController.getselectedIndex(index);
+      //   },
+      //   children: [
+      //     _buildHomeTab(context), // Home tab
+      //     _buildCategoriesTab(),
+      //     ProfileScreen(), // Profile tab
+      //   ],
+      // ),
+      body: Obx(() => AnimatedSwitcher(
+            duration: const Duration(milliseconds: 100),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            // Optional: nice scale + fade effect
+            // transitionBuilder: (child, animation) => ScaleTransition(
+            //   scale: Tween<double>(begin: 0.92, end: 1.0).animate(animation),
+            //   child: FadeTransition(opacity: animation, child: child),
+            // ),
+            child: IndexedStack(
+              key: ValueKey<int>(
+                  homeController.selectedIndex), // ← very important!
+              index: homeController.selectedIndex,
+              children: [
+                _buildHomeTab(context),
+                _buildCategoriesTab(),
+                ProfileScreen(),
+              ],
+            ),
+          )),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      title: Obx(
+        () => Row(
+          children: [
+            if (homeController.selectedIndex == 0) ...[
+              _buildHomeTitle()
+            ] else if (homeController.selectedIndex == 1) ...[
+              Text(
+                'Categories',
+                style: header4.copyWith(
+                    fontWeight: FontWeight.w800, color: QZColor.headerColor),
+              ),
+            ] else ...[
+              Text(
+                'Profile',
+                style: header4.copyWith(
+                    fontWeight: FontWeight.w800, color: QZColor.headerColor),
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeTitle() {
+    return GestureDetector(
+      onTap: () {
+        homeController.getselectedIndex(2);
+        // pageController.animateToPage(
+        //   2,
+        //   duration: const Duration(milliseconds: 400),
+        //   curve: Curves.easeInOut,
+        // );
+      },
+      child: Row(
+        children: [
+          Container(
+            height: 30,
+            width: 30,
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+            child: Icon(
+              Icons.person,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (homeController.selectedIndex == 0) ...[
-                Container(
-                  height: 30,
-                  width: 30,
-                  decoration:
-                      BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
-                  child: Icon(
-                    Icons.person,
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      profileController.userInfo['name'] ?? '',
-                      style: header4.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: QZColor.headerColor),
-                    ),
-                    Text(
-                      'ID - ${profileController.userInfo['_id']}',
-                      style: header8.copyWith(
-                          fontWeight: FontWeight.w600, color: Colors.blueGrey),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ] else ...[
-                Text(
-                  'Profile',
-                  style: header4.copyWith(
-                      fontWeight: FontWeight.w800, color: QZColor.headerColor),
-                ),
-              ]
+              Text(
+                profileController.userInfo['name'] ?? '',
+                style: header4.copyWith(
+                    fontWeight: FontWeight.w800, color: QZColor.headerColor),
+              ),
+              Text(
+                'ID - ${profileController.userInfo['_id']}',
+                style: header8.copyWith(
+                    fontWeight: FontWeight.w600, color: Colors.blueGrey),
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
-          // bottom: PreferredSize(
-          //     preferredSize: Size.fromHeight(1), child: Divider()),
-        ),
-        body: PageView(
-          controller: pageController,
-          onPageChanged: (index) {
-            homeController.getselectedIndex(index);
-          },
-          children: [
-            _buildHomeTab(context), // Home tab
-            ProfileScreen(), // Profile tab
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: homeController.selectedIndex,
-          onTap: (index) {
-            homeController.getselectedIndex(index);
-            pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.home),
-              label:
-                  homeController.isSelected == 'ENGLISH' ? 'Home' : 'गृहपृष्ठ',
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return Obx(
+      () => BottomNavigationBar(
+        currentIndex: homeController.selectedIndex,
+        selectedItemColor: QZColor.headerColor,
+        unselectedItemColor: const Color.fromARGB(255, 61, 57, 57),
+        selectedLabelStyle: header6.copyWith(
+            fontWeight: FontWeight.w600, color: QZColor.headerColor),
+        unselectedLabelStyle:
+            header6.copyWith(fontWeight: FontWeight.w400, color: Colors.grey),
+        onTap: (index) {
+          homeController.getselectedIndex(index);
+          // pageController.animateToPage(
+          //   index,
+          //   duration: const Duration(milliseconds: 300),
+          //   curve: Curves.easeInOut,
+          // );
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              DTIcons.homeIcon,
+              height: 20,
+              width: 20,
+              color: homeController.selectedIndex == 0
+                  ? QZColor.headerColor
+                  : Colors.grey,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.person),
-              label: homeController.isSelected == 'ENGLISH'
-                  ? 'Profile'
-                  : 'प्रोफाइल',
+            label: homeController.isSelected == 'ENGLISH' ? 'Home' : 'गृहपृष्ठ',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              DTIcons.categoriesIcon,
+              height: 20,
+              width: 20,
+              color: homeController.selectedIndex == 1
+                  ? QZColor.headerColor
+                  : Colors.grey,
             ),
-          ],
-        ),
+            label: homeController.isSelected == 'ENGLISH'
+                ? 'Categories'
+                : 'श्रेणी',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              DTIcons.profileIcon,
+              height: 20,
+              width: 20,
+              color: homeController.selectedIndex == 2
+                  ? QZColor.headerColor
+                  : Colors.grey,
+            ),
+            label:
+                homeController.isSelected == 'ENGLISH' ? 'Profile' : 'प्रोफाइल',
+          ),
+        ],
       ),
     );
   }
@@ -118,17 +202,39 @@ class HomePageScreen extends StatelessWidget {
           children: [
             _buildHeroBanner(context),
             const SizedBox(height: 15),
-            Text(
-              'Categories',
-              style: header5.copyWith(
-                  fontWeight: FontWeight.w700, color: QZColor.headerColor),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Categories',
+                  style: header5.copyWith(
+                      fontWeight: FontWeight.w700, color: QZColor.headerColor),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    homeController.getselectedIndex(1);
+                    // pageController.animateToPage(
+                    //   1,
+                    //   duration: const Duration(milliseconds: 200),
+                    //   curve: Curves.easeInOut,
+                    // );
+                  },
+                  child: Text(
+                    'View All >',
+                    style: header7.copyWith(
+                        fontWeight: FontWeight.w700, color: QZColor.color2),
+                  ),
+                ),
+              ],
             ),
             SizedBox(
               height: 100,
               child: ListView.builder(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                itemCount: homeController.quizType.length,
+                itemCount: homeController.quizType.length > 5
+                    ? 5
+                    : homeController.quizType.length,
                 itemBuilder: (context, index) {
                   final quizType = homeController.quizType[index];
                   return Padding(
@@ -265,6 +371,70 @@ class HomePageScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildCategoriesTab() {
+    return Column(
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: homeController.quizType.length,
+          itemBuilder: (context, index) {
+            final quizType = homeController.quizType[index];
+            return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(() => QuizScreen(
+                          quizName: quizType['name'],
+                          quizType: quizType['_id'],
+                        ));
+                  },
+                  child: Container(
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: QZColor.headerColor.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 15),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              _buildCategoryIcon(quizType['name']),
+                              height: 35,
+                              width: 35,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              quizType['name'],
+                              style: header6.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ));
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildHeroBanner(BuildContext context) {
     return Container(
       height: 210,
@@ -322,7 +492,15 @@ class HomePageScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              final mixedType = homeController.quizType
+                  .firstWhere((e) => e['name'] == 'Mixed');
+
+              Get.to(() => QuizScreen(
+                    quizName: mixedType['name'],
+                    quizType: mixedType['_id'],
+                  ));
+            },
             child: Text(
               'Play Now',
               style: header6.copyWith(fontWeight: FontWeight.w700),
@@ -395,6 +573,6 @@ class HomePageScreen extends StatelessWidget {
     } else if (text == 'General knowledge') {
       return DTIcons.gkIcon;
     }
-    return DTIcons.scienceIcon;
+    return DTIcons.mixedIcon;
   }
 }

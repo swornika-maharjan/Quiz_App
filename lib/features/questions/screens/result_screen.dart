@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quizzie/features/questions/controllers/questions_controller.dart';
+import 'package:quizzie/utils/colors.dart';
+import 'package:quizzie/utils/styles.dart';
 
 class ResultScreen extends StatelessWidget {
   // final String quizType;
@@ -31,7 +33,7 @@ class ResultScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Your Score: ${result['score']}/${result['total']}',
+              'Score: ${result['score']}/${result['questions'].length}',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -65,28 +67,67 @@ class ResultScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${index + 1}. ${question['questionText']}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          // Container(
+                          //   width: double.infinity,
+                          //   padding: const EdgeInsets.symmetric(
+                          //       vertical: 10, horizontal: 16),
+                          //   decoration: BoxDecoration(
+                          //     borderRadius: BorderRadius.circular(5),
+                          //     color: Colors.indigo.withOpacity(0.1),
+                          //   ),
+                          //   child:
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${index + 1}. ${question['questionText']}',
+                                style: header5.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: QZColor.headerColor),
+                              ),
+                            ],
+                          ),
+                          // ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                            height: 40,
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: isCorrect
+                                  ? Colors.green.withOpacity(0.2)
+                                  : Colors.red.withOpacity(0.2),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Your Answer: ${userAnswer ?? "Not answered"}',
+                                style: header7.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 5),
-                          Text(
-                            'Your Answer: ${userAnswer ?? "Not answered"}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isCorrect ? Colors.green : Colors.red,
-                            ),
-                          ),
                           if (!isCorrect)
-                            Text(
-                              'Correct Answer: $correctAnswer',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.green,
-                                fontWeight: FontWeight.w500,
+                            Container(
+                              height: 40,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Correct Answer: $correctAnswer',
+                                  style: header7.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.green),
+                                ),
                               ),
                             ),
                         ],

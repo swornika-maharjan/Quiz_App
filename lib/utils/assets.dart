@@ -9,6 +9,9 @@ class DTIcons {
   static const String sportsIcon = 'assets/icons/sports.svg';
   static const String gkIcon = 'assets/icons/gk.svg';
   static const String mixedIcon = 'assets/icons/mixed.svg';
+  static const String homeIcon = 'assets/icons/home.svg';
+  static const String categoriesIcon = 'assets/icons/categories.svg';
+  static const String profileIcon = 'assets/icons/profile.svg';
 }
 
 class DTImages {

@@ -19,7 +19,8 @@ class HistoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Quiz History',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+          style: header5.copyWith(
+              fontWeight: FontWeight.w700, color: QZColor.headerColor),
         ),
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
@@ -42,18 +43,23 @@ class HistoryScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       ListTile(
-                          title: Text(
-                            '${StringCasingExtension(item['quizType'].toString()).capitalizeFirst()} Quiz',
-                            style: header6.copyWith(
-                                color: QZColor.headerColor,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          subtitle: Text(formattedDate,
-                              style: header7.copyWith(color: Colors.grey)),
-                          trailing: Icon(
-                            Icons.keyboard_arrow_right,
-                            size: 24,
-                          )),
+                        title: Text(
+                          '${StringCasingExtension(item['quizName'].toString()).capitalizeFirst()} Quiz',
+                          style: header6.copyWith(
+                              color: QZColor.headerColor,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(formattedDate,
+                            style: header7.copyWith(color: Colors.grey)),
+                        trailing: Text(
+                          'Score: ${item['score']}/ ${results[0]['questions'].length}',
+                          style: header5.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: item['score'] >= 12
+                                  ? Colors.green
+                                  : Colors.red),
+                        ),
+                      ),
                       Divider()
                     ],
                   ),
