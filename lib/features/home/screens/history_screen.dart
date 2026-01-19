@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:quizzie/features/questions/screens/result_screen.dart';
+import 'package:quizzie/utils/colors.dart';
+import 'package:quizzie/utils/styles.dart';
 import 'package:quizzie/utils/utils.dart';
 
 class HistoryScreen extends StatelessWidget {
@@ -31,20 +33,29 @@ class HistoryScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = results[index];
                 final formattedDate = DateFormat.yMMMd().add_jm().format(
-                  DateTime.parse(item['timestamp']),
-                );
+                      DateTime.parse(item['timestamp']),
+                    );
                 return GestureDetector(
                   onTap: () => Get.to(
                     () => ResultScreen(result: Map<String, dynamic>.from(item)),
                   ),
-                  child: ListTile(
-                    title: Text(
-                      '${StringCasingExtension(item['quizType'].toString()).capitalizeFirst()} Quiz',
-                    ),
-                    subtitle: Text(
-                      'Score: ${item['score']} / ${item['total']}',
-                    ),
-                    trailing: Text(formattedDate),
+                  child: Column(
+                    children: [
+                      ListTile(
+                          title: Text(
+                            '${StringCasingExtension(item['quizType'].toString()).capitalizeFirst()} Quiz',
+                            style: header6.copyWith(
+                                color: QZColor.headerColor,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          subtitle: Text(formattedDate,
+                              style: header7.copyWith(color: Colors.grey)),
+                          trailing: Icon(
+                            Icons.keyboard_arrow_right,
+                            size: 24,
+                          )),
+                      Divider()
+                    ],
                   ),
                 );
               },

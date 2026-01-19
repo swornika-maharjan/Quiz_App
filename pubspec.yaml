@@ -51,6 +51,16 @@ dependencies:
   cloud_firestore: ^5.6.12
   firebase_auth: ^5.7.0
   dio: ^5.9.0
+  flutter_launcher_icons: ^0.14.4
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/applogo.png"
+  adaptive_icon_foreground: "assets/images/applogo.png"
+  adaptive_icon_background: "#00000000"
+
 
 dev_dependencies:
   flutter_test:

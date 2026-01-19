@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:quizzie/api-service/api_service.dart';
 import 'package:quizzie/features/home/screens/home_page_screen.dart';
 
 class LoginController extends GetxController {
-  final loginFormKey = GlobalKey<FormBuilderState>();
-  final registerFormKey = GlobalKey<FormBuilderState>();
+  
+  
   final RxList _tabs = ['Login', 'Register'].obs;
   var formData = <String, dynamic>{}.obs;
 

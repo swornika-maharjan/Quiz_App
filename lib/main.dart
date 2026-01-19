@@ -5,7 +5,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:quizzie/api-service/api_service.dart';
-import 'package:quizzie/features/auth/screens/login_screen.dart';
 import 'package:quizzie/features/home/controllers/theme_controller.dart';
 import 'package:quizzie/features/home/screens/home_page_screen.dart';
 import 'package:quizzie/features/questions/controllers/questions_controller.dart';

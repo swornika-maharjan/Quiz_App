@@ -30,9 +30,17 @@ class QuestionsController extends GetxController {
     return _quizData.where((e) => e['quizType']['_id'] == quizType).toList();
   }
 
-  // List getQuizData(String quizType) {
-  //   return _quizData; // always return API list
-  // }
+  void nextQuestion(int total) {
+    if (currentQuestionIndex.value < total - 1) {
+      currentQuestionIndex.value++;
+    }
+  }
+
+  void previousQuestion() {
+    if (currentQuestionIndex.value > 0) {
+      currentQuestionIndex.value--;
+    }
+  }
 
   void setQuizType(String quizType) {
     _currentQuizType.value = quizType;

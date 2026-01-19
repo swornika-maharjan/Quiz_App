@@ -1,101 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:quizzie/features/home/controllers/home_controller.dart';
+import 'package:quizzie/features/home/controllers/profile_controller.dart';
 import 'package:quizzie/features/home/screens/history_screen.dart';
 import 'package:quizzie/features/home/screens/profile_screen.dart';
 import 'package:quizzie/features/questions/screens/quiz_screen.dart';
+import 'package:quizzie/features/questions/screens/result_screen.dart';
+import 'package:quizzie/utils/assets.dart';
+import 'package:quizzie/utils/colors.dart';
 import 'package:quizzie/utils/styles.dart';
+import 'package:intl/intl.dart';
+
+import 'package:quizzie/utils/utils.dart';
 
 class HomePageScreen extends StatelessWidget {
   HomePageScreen({super.key});
 
   final HomeController homeController = Get.put(HomeController());
   final PageController pageController = PageController();
+  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
-        drawer: Drawer(
-          width: 300,
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text(
-                'quizzie'.tr,
-                style: header2.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Colors.deepPurple,
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(Icons.clear)),
-                )
-              ],
-              bottom: const PreferredSize(
-                preferredSize: Size.fromHeight(1),
-                child: Divider(),
-              ),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.to(() => HistoryScreen());
-                    },
-                    child: Container(
-                      height: 44,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.1),
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.history),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'history'.tr,
-                            style: header6.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.blueGrey),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-        appBar: homeController.selectedIndex == 0
-            ? AppBar(
-                title: Text(
-                  'quizzie'.tr,
-                  style: header2.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: Colors.deepPurple,
+        appBar: AppBar(
+          title: Row(
+            children: [
+              if (homeController.selectedIndex == 0) ...[
+                Container(
+                  height: 30,
+                  width: 30,
+                  decoration:
+                      BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+                  child: Icon(
+                    Icons.person,
                   ),
                 ),
-                bottom: const PreferredSize(
-                  preferredSize: Size.fromHeight(1),
-                  child: Divider(),
+                SizedBox(
+                  width: 10,
                 ),
-              )
-            : null,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profileController.userInfo['name'] ?? '',
+                      style: header4.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: QZColor.headerColor),
+                    ),
+                    Text(
+                      'ID - ${profileController.userInfo['_id']}',
+                      style: header8.copyWith(
+                          fontWeight: FontWeight.w600, color: Colors.blueGrey),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ] else ...[
+                Text(
+                  'Profile',
+                  style: header4.copyWith(
+                      fontWeight: FontWeight.w800, color: QZColor.headerColor),
+                ),
+              ]
+            ],
+          ),
+          // bottom: PreferredSize(
+          //     preferredSize: Size.fromHeight(1), child: Divider()),
+        ),
         body: PageView(
           controller: pageController,
           onPageChanged: (index) {
@@ -141,99 +116,285 @@ class HomePageScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildHeroBanner(context),
+            const SizedBox(height: 15),
             Text(
-              "Let's Play ",
-              style: header3.copyWith(
-                fontWeight: FontWeight.w800,
-                color: Colors.purpleAccent,
-              ),
-            ),
-            Text(
-              'Be the first!',
+              'Categories',
               style: header5.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Colors.blueGrey[1400],
+                  fontWeight: FontWeight.w700, color: QZColor.headerColor),
+            ),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: homeController.quizType.length,
+                itemBuilder: (context, index) {
+                  final quizType = homeController.quizType[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    child: _buildQuizContainer(
+                      onTap: () => Get.to(() => QuizScreen(
+                          quizType: quizType['_id'],
+                          quizName: quizType['name'])),
+                      text: quizType['name'],
+                      icon: _buildCategoryIcon(quizType['name']),
+                    ),
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 10),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: homeController.quizType.length,
-              itemBuilder: (context, index) {
-                final quizType = homeController.quizType[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: _buildQuizContainer(
-                    onTap: () =>
-                        Get.to(() => QuizScreen(quizType: quizType['_id'])),
-                    text: quizType['name'],
-                    description: quizType['description'],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Recent Activity',
+                  style: header5.copyWith(
+                      fontWeight: FontWeight.w700, color: QZColor.headerColor),
+                ),
+                GestureDetector(
+                  onTap: () => Get.to(() => HistoryScreen()),
+                  child: Text(
+                    'View All >',
+                    style: header7.copyWith(
+                        fontWeight: FontWeight.w700, color: QZColor.color2),
                   ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Obx(() {
+              if (homeController.recentResults.isEmpty) {
+                return Center(child: Image.asset(DTImages.noActivityImage));
+              } else {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: homeController.recentResults.length > 5
+                      ? 5
+                      : homeController.recentResults.length,
+                  itemBuilder: (context, index) {
+                    final item = homeController.recentResults[index];
+                    final formattedDate = DateFormat.yMMMd().add_jm().format(
+                          DateTime.parse(item['timestamp']),
+                        );
+                    return GestureDetector(
+                      onTap: () => Get.to(() => ResultScreen(
+                          result: Map<String, dynamic>.from(item))),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Container(
+                          height: 60,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Colors.grey),
+                            color: Colors.white, // needed for shadow to appear
+                            boxShadow: [
+                              BoxShadow(
+                                color: QZColor.headerColor.withOpacity(0.5),
+                                spreadRadius: 1, // how much the shadow spreads
+                                blurRadius: 6, // softness of the shadow
+                                offset: Offset(0, 3), // x and y offset
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    _buildCategoryIcon(item['quizName']),
+                                    height: 35,
+                                    width: 35,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        '${item['quizName']} ',
+                                        style: header6.copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(formattedDate,
+                                          style: header7.copyWith(
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  homeController.deleteResult(index);
+                                },
+                                child: Icon(
+                                  Icons.delete,
+                                  size: 18,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
-              },
-            )
+              }
+            })
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuizContainer(
-      {required void Function()? onTap,
-      required String text,
-      required String description}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        height: 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.indigo.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              blurRadius: 12,
-              spreadRadius: 3,
-              offset: const Offset(4, 4),
-            ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.8),
-              blurRadius: 6,
-              offset: const Offset(-4, -4),
-            ),
+  Widget _buildHeroBanner(BuildContext context) {
+    return Container(
+      height: 210,
+      width: double.infinity,
+      padding: const EdgeInsets.only(left: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF153A6F),
+            Color(0xFF0D2B57),
           ],
-          border: Border.all(color: Colors.grey.shade300, width: 1),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              text.tr,
-              style: header4.copyWith(
-                color: Colors.black,
-                letterSpacing: 0.5,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Text(
-              description,
-              style: header6.copyWith(
-                color: Colors.grey,
-                letterSpacing: 0.5,
-                fontWeight: FontWeight.w700,
-              ),
-            )
-          ],
+        image: DecorationImage(
+          image: AssetImage('assets/images/trophy.png'),
+          fit: BoxFit.cover,
+          opacity: 0.5,
         ),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.6,
+            child: Text(
+              'Test Your Knowledge with\nQuizzes',
+              style: header3.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.55,
+            child: Text(
+              "You're just looking for a playful way to learn new facts, our quizzes are designed to entertain and educate.",
+              style: header8.copyWith(
+                color: Colors.white.withOpacity(0.85),
+                height: 1.4,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF153A6F),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+            onPressed: () {},
+            child: Text(
+              'Play Now',
+              style: header6.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _buildQuizContainer({
+    required void Function()? onTap,
+    required String text,
+    required String icon,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              color: Colors.indigo.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+            ),
+            child: SvgPicture.asset(
+              icon,
+              height: 18,
+              width: 18,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          const SizedBox(height: 5),
+          SizedBox(
+            width: 60, //  restrict text width to icon width
+            child: Text(
+              text,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              style: header8.copyWith(
+                color: Colors.black,
+                letterSpacing: 0.5,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _buildCategoryIcon(String text) {
+    if (text == 'Science') {
+      return DTIcons.scienceIcon;
+    } else if (text == 'Maths') {
+      return DTIcons.mathsIcon;
+    } else if (text == 'Sports') {
+      return DTIcons.sportsIcon;
+    } else if (text == 'History') {
+      return DTIcons.historyIcon;
+    } else if (text == 'Geography') {
+      return DTIcons.geographyIcon;
+    } else if (text == 'Computer') {
+      return DTIcons.computerIcon;
+    } else if (text == 'General knowledge') {
+      return DTIcons.gkIcon;
+    }
+    return DTIcons.scienceIcon;
   }
 }

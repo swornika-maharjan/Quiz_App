@@ -14,13 +14,14 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final quizType = result['quizType'];
+    // final quizType = result['quizType'];
+    final quizName = result['quizName'];
     final questions = result['questions'] as List<dynamic>;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${quizType}_results'.tr,
+          '$quizName Results',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
@@ -98,26 +99,26 @@ class ResultScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
-        child: MaterialButton(
-          color: Colors.indigo,
-          height: 50,
-          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () {
-            questionsController.resetQuiz();
-            Get.back();
-          },
-          child: Text(
-            'try_again'.tr,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
+      // bottomNavigationBar: Padding(
+      //   padding: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
+      //   child: MaterialButton(
+      //     color: Colors.indigo,
+      //     height: 50,
+      //     shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      //     onPressed: () {
+      //       questionsController.resetQuiz();
+      //       Get.back();
+      //     },
+      //     child: Text(
+      //       'try_again'.tr,
+      //       style: const TextStyle(
+      //         fontWeight: FontWeight.w600,
+      //         fontSize: 13,
+      //         color: Colors.white,
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

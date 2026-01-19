@@ -9,6 +9,7 @@ class HomeController extends GetxController {
   final RxInt _selectedIndex = 0.obs;
   final RxList _quizType = [].obs;
   final RxBool _isLoading = false.obs;
+  var recentResults = <Map<String, dynamic>>[].obs;
 
   //getter
   String get isSelected => _isSelected.value;
@@ -20,6 +21,43 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     fetchQuizTypes();
+    loadRecentResults();
+  }
+
+  void loadRecentResults() {
+    final box = Hive.box('quiz_results');
+    final results = box.get('results', defaultValue: []) as List;
+
+    // Convert each result to Map<String, dynamic>
+    recentResults.assignAll(
+      results.map((e) => Map<String, dynamic>.from(e)).toList(),
+    );
+  }
+
+  void addResult(Map<String, dynamic> result) {
+    final box = Hive.box('quiz_results');
+    final currentResults = box.get('results', defaultValue: []) as List;
+
+    // Convert existing results to proper type
+    final updatedResults =
+        currentResults.map((e) => Map<String, dynamic>.from(e)).toList();
+
+    updatedResults.insert(0, result); // newest on top
+    box.put('results', updatedResults);
+
+    recentResults.insert(0, result); // update observable
+  }
+
+  void deleteResult(int index) {
+    final box = Hive.box('quiz_results');
+
+    // Remove from Hive
+    final currentResults = box.get('results', defaultValue: []) as List;
+    currentResults.removeAt(index);
+    box.put('results', currentResults);
+
+    // Remove from observable list
+    recentResults.removeAt(index);
   }
 
   void toggleTranslation(String value) {
