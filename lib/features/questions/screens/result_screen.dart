@@ -46,7 +46,7 @@ class ResultScreen extends StatelessWidget {
                 itemCount: questions.length,
                 itemBuilder: (context, index) {
                   final question = questions[index];
-                  final questionId = question['_id'];
+                  final String questionId = question['_id']?.toString() ?? question['questionText'] ?? 'q_$index';
                   final selectedAnswers = Map<String, dynamic>.from(
                     result['selectedAnswers'],
                   );
@@ -54,9 +54,8 @@ class ResultScreen extends StatelessWidget {
                     result['answerResults'],
                   );
 
-                  final userAnswer = selectedAnswers[questionId.toString()];
-                  final isCorrect =
-                      answerResults[questionId.toString()] ?? false;
+                  final userAnswer = selectedAnswers[questionId];
+                  final isCorrect = answerResults[questionId] ?? false;
 
                   final correctAnswer = question['correctAnswer'];
 

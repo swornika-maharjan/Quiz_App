@@ -482,30 +482,6 @@ class HomePageScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF153A6F),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-            onPressed: () {
-              final mixedType = homeController.quizType
-                  .firstWhere((e) => e['name'] == 'Mixed');
-
-              Get.to(() => QuizScreen(
-                    quizName: mixedType['name'],
-                    quizType: mixedType['_id'],
-                  ));
-            },
-            child: Text(
-              'Play Now',
-              style: header6.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
         ],
       ),
     );
@@ -558,20 +534,24 @@ class HomePageScreen extends StatelessWidget {
   }
 
   String _buildCategoryIcon(String text) {
-    if (text == 'Science') {
+    final category = text.toLowerCase().trim();
+
+    if (category.contains('science')) {
       return DTIcons.scienceIcon;
-    } else if (text == 'Maths') {
+    } else if (category.contains('math')) {
       return DTIcons.mathsIcon;
-    } else if (text == 'Sports') {
+    } else if (category.contains('sport')) {
       return DTIcons.sportsIcon;
-    } else if (text == 'History') {
+    } else if (category.contains('history')) {
       return DTIcons.historyIcon;
-    } else if (text == 'Geography') {
+    } else if (category.contains('geography')) {
       return DTIcons.geographyIcon;
-    } else if (text == 'Computer') {
+    } else if (category.contains('computer')) {
       return DTIcons.computerIcon;
-    } else if (text == 'General knowledge') {
+    } else if (category.contains('general knowledge') || category == 'gk') {
       return DTIcons.gkIcon;
+    } else if (category.contains('literature')) {
+      return DTIcons.historyIcon; // Placeholder for Literature
     }
     return DTIcons.mixedIcon;
   }

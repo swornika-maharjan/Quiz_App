@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:quizzie/api-service/api_service.dart';
+import 'package:quizzie/features/auth/screens/login_screen.dart';
 import 'package:quizzie/features/home/screens/home_page_screen.dart';
 
 class LoginController extends GetxController {
-  
-  
   final RxList _tabs = ['Login', 'Register'].obs;
   var formData = <String, dynamic>{}.obs;
 
@@ -35,7 +34,7 @@ class LoginController extends GetxController {
 
         print('Successfully logged in: ${res['message']}');
         // Get.snackbar('Success', res['message'],
-            // backgroundColor: Colors.green, colorText: Colors.white);
+        // backgroundColor: Colors.green, colorText: Colors.white);
         Get.offAll(() => HomePageScreen());
       },
       errorCallback: (err) {
@@ -57,6 +56,7 @@ class LoginController extends GetxController {
           Get.snackbar('Success', res['message'],
               backgroundColor: Colors.green, colorText: Colors.white);
           formData.clear();
+          Get.off(() => LoginScreen());
         },
         errorCallback: (err) {
           print('Error: ${err['message']}');

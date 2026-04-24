@@ -65,7 +65,9 @@ class QuizScreen extends StatelessWidget {
           return Obx(() {
             final index = questionsController.currentQuestionIndex.value;
             final question = questions[index];
-            final questionId = question['_id'];
+            final String questionId = question['_id']?.toString() ??
+                question['questionText'] ??
+                'q_$index';
             final selected = questionsController.selectedAnswers[questionId];
 
             return Padding(
@@ -122,16 +124,16 @@ class QuizScreen extends StatelessWidget {
                           height: 10,
                         ),
                         Text(
-                          question['questionText'],
+                          question['questionText'] ?? 'No Question Text',
                           style: header4.copyWith(
                             fontWeight: FontWeight.w600,
                             color: QZColor.headerColor,
                           ),
                         ),
                         const SizedBox(height: 20),
-                        ...List.generate((question['options'] as List).length,
-                            (i) {
-                          final option = question['options'][i];
+                        ...List.generate(
+                            ((question['options'] ?? []) as List).length, (i) {
+                          final option = question['options']?[i] ?? '';
                           final isSelected = selected == option;
 
                           return GestureDetector(

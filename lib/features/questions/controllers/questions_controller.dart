@@ -27,7 +27,9 @@ class QuestionsController extends GetxController {
 
   // Get quiz data based on quiz type
   List getQuizData(String quizType) {
-    return _quizData.where((e) => e['quizType']['_id'] == quizType).toList();
+    return _quizData
+        .where((e) => e['quizType'] != null && e['quizType']['_id'] == quizType)
+        .toList();
   }
 
   void nextQuestion(int total) {
@@ -58,13 +60,16 @@ class QuestionsController extends GetxController {
     final quizData = getQuizData(quizType);
     final questions = quizData.isNotEmpty ? quizData[0]['questions'] : [];
 
-    for (var question in questions) {
-      final questionId = question['_id'];
+    for (var i = 0; i < questions.length; i++) {
+      final question = questions[i];
+      final String questionId =
+          question['_id']?.toString() ?? question['questionText'] ?? 'q_$i';
       final correctAnswer = question['correctAnswer'];
       final userAnswer = selectedAnswers[questionId];
 
       if (userAnswer != null) {
-        final isCorrect = userAnswer == correctAnswer;
+        final isCorrect = userAnswer.trim().toLowerCase() ==
+            correctAnswer.toString().trim().toLowerCase();
         _answerResults[questionId] = isCorrect;
         if (isCorrect) _score.value++;
       } else {
